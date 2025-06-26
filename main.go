@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"slices"
 	"sync"
 	"time"
 )
@@ -21,57 +20,56 @@ func generateRandomElements(size int) []int {
 	}
 	sliceElem := make([]int, 0, size)
 
-	for i := 0; i <= size; i++ {
+	for i := 0; i < size; i++ {
 		sliceElem = append(sliceElem, rand.Int())
 	}
 
 	return sliceElem
 }
 
-// maximum returns the maximum number of elements.
 func maximum(data []int) int {
-	// ваш код здесь
 
 	if len(data) <= 0 {
 		return 0
 	}
-	maxNumber := slices.Max(data)
+	maxNumber := 0
+	for _, v := range data {
+		if maxNumber < v {
+			maxNumber = v
+		}
+	}
+
 	return maxNumber
 }
 
 // maxChunks returns the maximum number of elements in a chunks.
 func maxChunks(data []int) int {
 	var wg sync.WaitGroup
-	result := make(chan int, CHUNKS)
+	//result := make(chan int, CHUNKS)
+	result := make([]int, CHUNKS)
+
+	if len(data) < CHUNKS {
+		return maximum(data)
+	}
 
 	for i := 0; i < CHUNKS; i++ {
 
 		idx1 := len(data) / CHUNKS * i
 		idx2 := len(data) / CHUNKS * (i + 1)
-
+		sl1 := data[idx1:idx2]
 		wg.Add(1)
-		go func(idx1, idx2 int) {
+		go func(sl1 []int, i int) {
 			defer wg.Done()
-			sl1 := data[idx1:idx2]
-			result <- maximum(sl1)
 
-		}(idx1, idx2)
+			result[i] = maximum(sl1)
+
+		}(sl1, i)
 
 	}
+	wg.Wait()
 
-	go func() {
-		wg.Wait()
-		close(result)
-	}()
+	return maximum(result)
 
-	maxRut := 0
-	for max_value := range result {
-		if max_value > maxRut {
-			maxRut = max_value
-		}
-	}
-	return maxRut
-	// ваш код здесь
 }
 
 func main() {

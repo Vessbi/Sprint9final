@@ -1,27 +1,41 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 // Пишите тесты в этом файле
 
 func TestMaximum(t *testing.T) {
-	randSlice := [][]int{
-		{5, 10, 67, 350, -1},
-		{10},
-		{},
-	}
-	// ожидаемые значения для каждой последовательности
-	max := []int{350, 10, 0}
 
-	for i, list := range randSlice {
-		if maximum(list) != max[i] {
-			t.Error(i, ":", maximum(list), "!=", max[i])
-		}
+	var flagtest = []struct {
+		in  []int
+		out int
+	}{
+		{nil, 0},
+		{[]int{5, 10, 67, 350}, 350},
+		{[]int{10}, 10},
+		{[]int{0}, 0},
+	}
+	for _, tt := range flagtest {
+		assert.Equal(t, maximum(tt.in), tt.out)
 	}
 }
 
 func TestGenerateRandomElements(t *testing.T) {
-	if generateRandomElements(0) != nil {
-		t.Error("slide size cannot be less than 0")
+	var flagtest = []struct {
+		in  int
+		out []int
+	}{
+		{0, nil},
+		{-10, nil},
 	}
+
+	for _, tt := range flagtest {
+		assert.Equal(t, generateRandomElements(tt.in), tt.out)
+		assert.Equal(t, cap(generateRandomElements(tt.in)), cap(tt.out))
+	}
+
 }
